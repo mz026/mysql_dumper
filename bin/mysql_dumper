@@ -1,4 +1,15 @@
 #! /usr/bin/env ruby
+# command line interface
+# usage:
+# 1. dump whole db:
+# $ mysql_dumper dump DBNAME --to SQL_FILE_PATH -u USERNAME
+#
+# 2. dump schema:
+# $ mysql_dumper dump_schema DBNAME --to SQL_FILE_PATH -u USERNAME [--perserve t1,t2...]
+#
+# 3. load schema to db:
+# $ mysql_dumper load DBNAME --from SQL_FILE_PATH -u USERNAME
+
 require 'optparse'
 require "mysql_dumper"
 
@@ -10,23 +21,18 @@ valid_actions = [ "dump", "dump_schema", "load" ]
 
 parser = OptionParser.new do |opts|
   opts.banner = "Usage: mysql_dumper ACTION [options]"
-
-  opts.on("-db", "--database DATABASE_NAME", "db to be dumped(loaded)") do |db_name|
-    config["database"] = db_name
-  end
-
   opts.on("-u", "--username USERNAME", "username to connect") do |username|
     config["username"] = username
   end
-
   opts.on("-t", "--preserve DBNAME1,DBNAME2,...", Array, "tables to preserve") do |tables|
     preserve = tables
   end
-
-  opts.on("-f", "--filename FILENAME", "file path of sql") do |filename|
+  opts.on("--to FILENAME", "file path of sql") do |filename|
     file = filename
   end
-
+  opts.on("--from FILENAME", "file path of sql") do |filename|
+    file = filename
+  end
   opts.on("-h", "--help") do 
     puts opts
   end
@@ -39,6 +45,7 @@ rescue Exception => e
   puts e.message
 end
 action = ARGV[0]
+config["database"] = ARGV[1]
 
 # check arguments
 def notify_missing attr_name, parser
