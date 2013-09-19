@@ -39,6 +39,9 @@ class ArgumentSet
       opts.on("--from FILENAME", "file path of sql") do |filename|
         @file = filename
       end
+      opts.on("-p", "--password PASSWORD", "password of db") do |pwd|
+        @config["password"] = pwd
+      end
       opts.on("-h", "--help") do 
         puts opts
       end
