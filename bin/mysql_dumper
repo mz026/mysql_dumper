@@ -13,63 +13,78 @@
 require 'optparse'
 require "mysql_dumper"
 
-config = {}
-preserve = []
-action = nil
-file = nil
-valid_actions = [ "dump", "dump_schema", "load" ]
+class ArgumentSet
+  attr_accessor :config, :action, :file, :preserve, :username, :error
+  VALID_ACTIONS = [ "dump", "dump_schema", "load" ]
+  def initialize
+    @config = {}
+    parser.parse! ARGV
+    @action = ARGV[0]
+    @config["database"] = ARGV[1]
+    @error = ""
+  end
 
-parser = OptionParser.new do |opts|
-  opts.banner = "Usage: mysql_dumper ACTION [options]"
-  opts.on("-u", "--username USERNAME", "username to connect") do |username|
-    config["username"] = username
+  def parser
+    @parser ||= OptionParser.new do |opts|
+      opts.banner = "Usage: mysql_dumper ACTION [options]"
+      opts.on("-u", "--username USERNAME", "username to connect") do |username|
+        @config["username"] = username
+      end
+      opts.on("-t", "--preserve DBNAME1,DBNAME2,...", Array, "tables to preserve") do |tables|
+        @preserve = tables
+      end
+      opts.on("--to FILENAME", "file path of sql") do |filename|
+        @file = filename
+      end
+      opts.on("--from FILENAME", "file path of sql") do |filename|
+        @file = filename
+      end
+      opts.on("-h", "--help") do 
+        puts opts
+      end
+    end
   end
-  opts.on("-t", "--preserve DBNAME1,DBNAME2,...", Array, "tables to preserve") do |tables|
-    preserve = tables
+
+  def valid?
+    ensure_exists @config["username"], "username"
+    ensure_exists @config["database"], "database"
+    ensure_exists @file, "sql_file"
+    validate_action
+
+    @error == ""
   end
-  opts.on("--to FILENAME", "file path of sql") do |filename|
-    file = filename
+
+  def ensure_exists param, attr_name
+    if ! param
+      @error += "missing argument #{attr_name}\n"
+    end
   end
-  opts.on("--from FILENAME", "file path of sql") do |filename|
-    file = filename
+  
+  def validate_action
+    if ! VALID_ACTIONS.include? @action
+      @error += "invalid action: #{@action}"
+    end
   end
-  opts.on("-h", "--help") do 
-    puts opts
+
+  def show_help
+    puts parser
   end
+
 end
 
-# parse arguments
-begin
-  parser.parse! ARGV
-rescue Exception => e
-  puts e.message
-end
-action = ARGV[0]
-config["database"] = ARGV[1]
+arguments = ArgumentSet.new
 
-# check arguments
-def notify_missing attr_name, parser
-  puts "missing argument: #{attr_name}"
-  puts parser
-  exit
-end
-notify_missing("database", parser) unless config["database"]
-notify_missing("username", parser) unless config["username"]
-notify_missing("file path", parser) unless file
-
-
-dumper = MysqlDumper.new(config)
-
-case action
-when "dump"
-  dumper.dump_to(file)
-when "dump_schema"
-  dumper.dump_schema_to(file, { :preserve => preserve })
-when "load"
-  dumper.load_from(file)
+if arguments.valid?
+  dumper = MysqlDumper.new(arguments.config)
+  case arguments.action
+  when "dump"
+    dumper.dump_to(arguments.file)
+  when "dump_schema"
+    dumper.dump_schema_to(arguments.file, { :preserve => arguments.preserve })
+  when "load"
+    dumper.load_from(arguments.file)
+  end
 else
-  puts "unknown action: #{action}"
-  puts "valid actions: #{valid_actions.join(",")}"
-  puts parser
+  puts arguments.error
+  arguments.show_help
 end
-
