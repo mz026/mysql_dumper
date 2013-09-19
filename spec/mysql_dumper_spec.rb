@@ -67,11 +67,24 @@ describe MysqlDumper do
       end
     end
 
-    describe "dump_to(destination_file[, options])" do
-      
+    describe "#dump_to(destination_file)" do
+      it "dumps whole db to destination_file" do
+        @dumper.should_receive(:system).
+          with("mysqldump -u #{username} -p#{password} -R --skip-comments #{database} > #{file_path}")
+        @dumper.dump_to(file_path)
+      end
+    end
+
+    describe "#load_from(sql_file)" do
+      it "loads sql_file to specific db" do
+        @dumper.should_receive(:system).
+          with("cat #{file_path} | mysql -u #{username} -p#{password} #{database}")    
+        @dumper.load_from(file_path)
+      end
     end
     
   end
+
 
 
 end

@@ -1,6 +1,7 @@
 require "mysql_dumper/version"
 
 class MysqlDumper
+  class InitFailedException < Exception; end;
   def initialize config
     @password = config["password"]
     @username = config["username"]
@@ -20,5 +21,12 @@ class MysqlDumper
     end
   end
 
-  class InitFailedException < Exception; end;
+  def dump_to path
+    system "mysqldump -u #{@username} -p#{@password} -R --skip-comments #{@database} > #{path}"
+  end
+
+  def load_from path
+    system "cat #{path} | mysql -u #{@username} -p#{@password} #{@database}"
+  end
+
 end
