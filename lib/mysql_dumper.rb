@@ -11,10 +11,14 @@ class MysqlDumper
   end
 
   def dump_schema_to path, options = {}
-    system "mysqldump -u #{@username} -p#{@password} -R -d --skip-comments #{@database} > #{path}"
-  end
+    preserved_tables = options[:preserve] || []
+    table_string = preserved_tables.join(" ")
 
-    
+    system "mysqldump -u #{@username} -p#{@password} -R -d --skip-comments #{@database} > #{path}"
+    if ! table_string.strip.empty?
+      system "mysqldump -u #{@username} -p#{@password} --skip-comments #{@database} #{table_string} >> #{path}"
+    end
+  end
 
   class InitFailedException < Exception; end;
 end

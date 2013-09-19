@@ -31,26 +31,47 @@ describe MysqlDumper do
   ensure_in_config "password"
   ensure_in_config "database"
 
-  describe "#dump_schema_to(destination_file[, options])" do
+  context "dumping methods" do
     let(:file_path) { "/tmp/dummy.sql" }
     before(:each) do
       @dumper = MysqlDumper.new @config
       @dumper.stub(:system)
     end
+    describe "#dump_schema_to(destination_file[, options])" do
+      it "dump schema to destination_file" do
+        executed = false
+        @dumper.stub(:system) do |command|
+          sql = <<-SQL
+          mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} > #{file_path}
+          SQL
+          command.should == sql.strip
+          executed = true
+        end
 
-    it "dump to destination_file" do
-      executed = false
-      @dumper.stub(:system) do |command|
-        sql = <<-SQL
-        mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} > #{file_path}
-        SQL
-        command.should == sql.strip
-        executed = true
+        @dumper.dump_schema_to(file_path)   
+        executed.should be_true
       end
 
-      @dumper.dump_schema_to(file_path)   
-      executed.should be_true
+      it "preserves tables data if specified" do
+        table1 = "table1"
+        table2 = "table2"
+        sql_schema_only = 
+          "mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} > #{file_path}"
+        sql_with_tables =
+          "mysqldump -u #{username} -p#{password} --skip-comments #{database} #{table1} #{table2} >> #{file_path}"
+
+        @dumper.should_receive(:system).with(sql_schema_only)
+        @dumper.should_receive(:system).with(sql_with_tables)
+
+        @dumper.dump_schema_to(file_path, { :preserve => [ table1, table2 ] })   
+      end
     end
+
+    describe "dump_to(destination_file[, options])" do
+      
+    end
+    
   end
+
 
 end
