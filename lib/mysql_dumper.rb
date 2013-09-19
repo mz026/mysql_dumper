@@ -11,7 +11,7 @@ class MysqlDumper
   end
 
   def dump_schema_to path, options = {}
-    system "mysqldump -u #{@username} -p#{@password} -R -d #{@database} > #{path}"
+    system "mysqldump -u #{@username} -p#{@password} -R -d --skip-comments #{@database} > #{path}"
   end
 
     

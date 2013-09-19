@@ -42,7 +42,7 @@ describe MysqlDumper do
       executed = false
       @dumper.stub(:system) do |command|
         sql = <<-SQL
-        mysqldump -u #{username} -p#{password} -R -d #{database} > #{file_path}
+        mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} > #{file_path}
         SQL
         command.should == sql.strip
         executed = true
