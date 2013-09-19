@@ -1,3 +1,68 @@
 #! /usr/bin/env ruby
+require 'optparse'
+require "mysql_dumper"
 
-p "hi"
+config = {}
+preserve = []
+action = nil
+file = nil
+valid_actions = [ "dump", "dump_schema", "load" ]
+
+parser = OptionParser.new do |opts|
+  opts.banner = "Usage: mysql_dumper ACTION [options]"
+
+  opts.on("-db", "--database DATABASE_NAME", "db to be dumped(loaded)") do |db_name|
+    config["database"] = db_name
+  end
+
+  opts.on("-u", "--username USERNAME", "username to connect") do |username|
+    config["username"] = username
+  end
+
+  opts.on("-t", "--preserve DBNAME1,DBNAME2,...", Array, "tables to preserve") do |tables|
+    preserve = tables
+  end
+
+  opts.on("-f", "--filename FILENAME", "file path of sql") do |filename|
+    file = filename
+  end
+
+  opts.on("-h", "--help") do 
+    puts opts
+  end
+end
+
+# parse arguments
+begin
+  parser.parse! ARGV
+rescue Exception => e
+  puts e.message
+end
+action = ARGV[0]
+
+# check arguments
+def notify_missing attr_name, parser
+  puts "missing argument: #{attr_name}"
+  puts parser
+  exit
+end
+notify_missing("database", parser) unless config["database"]
+notify_missing("username", parser) unless config["username"]
+notify_missing("file path", parser) unless file
+
+
+dumper = MysqlDumper.new(config)
+
+case action
+when "dump"
+  dumper.dump_to(file)
+when "dump_schema"
+  dumper.dump_schema_to(file, { :preserve => preserve })
+when "load"
+  dumper.load_from(file)
+else
+  puts "unknown action: #{action}"
+  puts "valid actions: #{valid_actions.join(",")}"
+  puts parser
+end
+

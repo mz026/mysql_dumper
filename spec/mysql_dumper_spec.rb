@@ -28,7 +28,6 @@ describe MysqlDumper do
   end
 
   ensure_in_config "username"
-  ensure_in_config "password"
   ensure_in_config "database"
 
   context "dumping methods" do

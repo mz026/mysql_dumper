@@ -6,7 +6,6 @@ class MysqlDumper
     @password = config["password"]
     @username = config["username"]
     @database = config["database"]
-    raise InitFailedException, "password is required to init a dumper" unless @password
     raise InitFailedException, "username is required to init a dumper" unless @username
     raise InitFailedException, "database is required to init a dumper" unless @database
   end
