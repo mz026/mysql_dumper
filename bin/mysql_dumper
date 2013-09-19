@@ -30,20 +30,21 @@ class ArgumentSet
       opts.on("-u", "--username USERNAME", "username to connect") do |username|
         @config["username"] = username
       end
-      opts.on("-t", "--preserve DBNAME1,DBNAME2,...", Array, "tables to preserve") do |tables|
-        @preserve = tables
-      end
-      opts.on("--to FILENAME", "file path of sql") do |filename|
+      opts.on("-f", "--to FILENAME", "file path of sql") do |filename|
         @file = filename
       end
-      opts.on("--from FILENAME", "file path of sql") do |filename|
+      opts.on("-f", "--from FILENAME", "file path of sql") do |filename|
         @file = filename
       end
       opts.on("-p", "--password PASSWORD", "password of db") do |pwd|
         @config["password"] = pwd
       end
+      opts.on("-t", "--preserve DBNAME1,DBNAME2...", Array, "tables to preserve") do |tables|
+        @preserve = tables
+      end
       opts.on("-h", "--help") do 
         puts opts
+        exit
       end
     end
   end
