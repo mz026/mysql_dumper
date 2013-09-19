@@ -1,24 +1,40 @@
 # MysqlDumper
 
-TODO: Write a gem description
-
-## Installation
-
-Add this line to your application's Gemfile:
-
-    gem 'mysql_dumper'
-
-And then execute:
-
-    $ bundle
-
-Or install it yourself as:
-
-    $ gem install mysql_dumper
+MysqlDumper is a ruby wrapper of `mysqldump`.
+It provides both ruby and command line interface.
 
 ## Usage
 
-TODO: Write usage instructions here
+### Ruby interface:
+
+        require 'mysql_dumper'
+        config = {
+          "database" => "the_db_name",
+          "username" => "db_user_name"
+          "password" => "xxxx"
+        }
+
+        dumper = MysqlDumper.new config
+
+        # dump whole db, including stored procedure
+        dumper.dump_to("path/to/db.sql")
+
+        # dump only schema and certain tables
+        dumper.dump_schema_to("path/to/db.sql", { :preserve => ["table1", "table2"] })
+
+        # load a sql file to a database
+        dumper.load_from("path/to/db.sql")
+
+### command-line interface: (more expressive than native mysqldump interface)
+
+1. dump whole db:
+`$ mysql_dumper dump DBNAME --to path/to/db.sql -u USERNAME`
+
+2. dump schema only:
+`$ mysql_dumper dump_schema DBNAME --to path/to/schema.sql -u USERNAME [--perserve table1,table2...]`
+
+3. load from schema:
+`$ mysql_dumper load DBNAME --from path/to/db.sql -u USERNAME`
 
 ## Contributing
 
