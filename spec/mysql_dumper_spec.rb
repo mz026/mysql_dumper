@@ -41,7 +41,7 @@ describe MysqlDumper do
         executed = false
         @dumper.stub(:system) do |command|
           sql = <<-SQL
-          mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} | sed 's/ AUTO_INCREMENT=[0-9]*\b//' > #{file_path}
+          mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} | sed 's/ AUTO_INCREMENT=[0-9]*\\b//' > #{file_path}
           SQL
           command.should == sql.strip
           executed = true
@@ -55,7 +55,7 @@ describe MysqlDumper do
         table1 = "table1"
         table2 = "table2"
         sql_schema_only = 
-          "mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} | sed 's/ AUTO_INCREMENT=[0-9]*\b//' > #{file_path}"
+          "mysqldump -u #{username} -p#{password} -R -d --skip-comments #{database} | sed 's/ AUTO_INCREMENT=[0-9]*\\b//' > #{file_path}"
         sql_with_tables =
           "mysqldump -u #{username} -p#{password} --skip-comments #{database} #{table1} #{table2} >> #{file_path}"
 

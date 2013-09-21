@@ -14,7 +14,7 @@ class MysqlDumper
     preserved_tables = options[:preserve] || []
     table_string = preserved_tables.join(" ")
 
-    system "mysqldump -u #{@username} -p#{@password} -R -d --skip-comments #{@database} | sed 's/ AUTO_INCREMENT=[0-9]*\b//' > #{path}"
+    system "mysqldump -u #{@username} -p#{@password} -R -d --skip-comments #{@database} | sed 's/ AUTO_INCREMENT=[0-9]*\\b//' > #{path}"
     if ! table_string.strip.empty?
       system "mysqldump -u #{@username} -p#{@password} --skip-comments #{@database} #{table_string} >> #{path}"
     end
