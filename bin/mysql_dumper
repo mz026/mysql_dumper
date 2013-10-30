@@ -26,7 +26,15 @@ class ArgumentSet
 
   def parser
     @parser ||= OptionParser.new do |opts|
-      opts.banner = "Usage: mysql_dumper ACTION [options]"
+      opts.banner = <<-BANNER
+Usage: mysql_dumper ACTION [options]
+
+ACTIONS:
+  dump:         dump whole database to file, including schema, data and stored procedures.
+  dump_schema:  dump schema to file
+  load:         load sql file and import it to db
+
+      BANNER
       opts.on("-u", "--username USERNAME", "username to connect") do |username|
         @config["username"] = username
       end
