@@ -2,13 +2,13 @@
 # command line interface
 # usage:
 # 1. dump whole db:
-# $ mysql_dumper dump DBNAME --to SQL_FILE_PATH -u USERNAME
+# $ mysql_dumper dump DBNAME --to SQL_FILE_PATH -u USERNAME -h HOST
 #
 # 2. dump schema:
-# $ mysql_dumper dump_schema DBNAME --to SQL_FILE_PATH -u USERNAME [--perserve t1,t2...]
+# $ mysql_dumper dump_schema DBNAME --to SQL_FILE_PATH -u USERNAME -h HOST [--perserve t1,t2...]
 #
 # 3. load schema to db:
-# $ mysql_dumper load DBNAME --from SQL_FILE_PATH -u USERNAME
+# $ mysql_dumper load DBNAME --from SQL_FILE_PATH -u USERNAME -h HOST
 
 require 'optparse'
 require "mysql_dumper"
@@ -46,6 +46,9 @@ ACTIONS:
       end
       opts.on("-p", "--password PASSWORD", "password of db") do |pwd|
         @config["password"] = pwd
+      end
+      opts.on("-h", "--host HOST", "host for db") do |pwd|
+        @config["host"] = host
       end
       opts.on("-t", "--preserve DBNAME1,DBNAME2...", Array, "tables to preserve") do |tables|
         @preserve = tables
