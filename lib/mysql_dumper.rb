@@ -15,18 +15,18 @@ class MysqlDumper
     preserved_tables = options[:preserve] || []
     table_string = preserved_tables.join(" ")
 
-    system "mysqldump -u #{@username} -p#{@password} -h#{{@host}} -R -d --skip-comments #{@database} | sed 's/ AUTO_INCREMENT=[0-9]*\\b//' > #{path}"
+    system "mysqldump -u #{@username} -p#{@password} -h#{@host} -R -d --skip-comments #{@database} | sed 's/ AUTO_INCREMENT=[0-9]*\\b//' > #{path}"
     if ! table_string.strip.empty?
-      system "mysqldump -u #{@username} -p#{@password} -h#{{@host}} --skip-comments #{@database} #{table_string} >> #{path}"
+      system "mysqldump -u #{@username} -p#{@password} -h#{@host} --skip-comments #{@database} #{table_string} >> #{path}"
     end
   end
 
   def dump_to path
-    system "mysqldump -u #{@username} -p#{@password} -h#{{@host}} -R --skip-comments #{@database} > #{path}"
+    system "mysqldump -u #{@username} -p#{@password} -h#{@host} -R --skip-comments #{@database} > #{path}"
   end
 
   def load_from path
-    system "cat #{path} | mysql -u #{@username} -p#{@password} -h#{{@host}} #{@database}"
+    system "cat #{path} | mysql -u #{@username} -p#{@password} -h#{@host} #{@database}"
   end
 
 end
