@@ -27,7 +27,7 @@ class MysqlDumper
   end
 
   def load_from path
-    system "cat #{path} | mysql -u #{@username} -p#{@password} -h#{@host} #{@options} #{@database}"
+    system "cat #{path} | mysql -u #{@username} -p#{@password} -h#{@host} #{@database}"
   end
 
 end
